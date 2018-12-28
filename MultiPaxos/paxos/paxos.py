@@ -7,6 +7,7 @@ import socket
 import struct
 import time
 import threading
+from collections import defaultdict
 
 BUFFER_SIZE = 512
 #increase buffer for catchup
@@ -239,6 +240,9 @@ class learner(object):
         self.written = {}
         self.order = []
         self.values = []
+        self.IO = defaultdict(dict)
+        self.total_order = defaultdict(dict)
+        self.last = defaultdict(int)
         catchup = threading.Thread(target=self.request_catchup)
         catchup.start()
         self.listen()
@@ -248,36 +252,75 @@ class learner(object):
         m = Msg(phase='Request_catchup')
         self.s.sendto(serialize(m), self.config['learners'])
 
+    # def handle_catchup(self,msg):
+    #     #if you are not caught up
+    #     if len(self.order)==0:
+    #         self.order = msg.order
+    #         # deliver msgs in the order
+    #         for k,v in zip(msg.order,msg.values):
+    #             #write msgs if not delivered
+    #             if k not in self.written.keys():
+    #                 self.written[k] = v
+    #                 print(v,flush=True)
+
+    # def msg_replay(self):
+    #     #only send catch up if you have been caught up
+    #     if len(self.order)>0:
+    #         #send all msgs that have been decided, and their order
+    #         m = Msg(phase="Catch_up", values=self.values,order=self.order)
+    #         self.s.sendto(serialize(m), self.config['learners'])
+
+    # def write(self,msg):
+    #     if msg.instance not in self.written.keys():
+    #         print(msg.vval, flush=True)
+    #         self.written[msg.instance]=True
+    #         self.order.append(msg.instance)
+    #         self.values.append(msg.vval)
+    #         self.learned[msg.instance] = msg
+
     def handle_catchup(self,msg):
         #if you are not caught up
-        if len(self.order)==0:
-            self.order = msg.order
+        if len(self.total_order.keys())==0:
+            self.total_order = msg.order
             # deliver msgs in the order
-            for k,v in zip(msg.order,msg.values):
-                #write msgs if not delivered
-                if k not in self.written.keys():
-                    self.written[k] = v
-                    print(v,flush=True)
+            for id in self.total_order.keys():
+                for instance in range(len(self.total_order[id].keys())):
+                    val = self.total_order[id][instance]
+                    self.last[id]+=1
+                    print(val,flush=True)
 
     def msg_replay(self):
         #only send catch up if you have been caught up
-        if len(self.order)>0:
+        if len(self.total_order.keys())>0:
             #send all msgs that have been decided, and their order
-            m = Msg(phase="Catch_up", values=self.values,order=self.order)
+            m = Msg(phase="Catch_up", values=self.values,order=self.total_order)
             self.s.sendto(serialize(m), self.config['learners'])
 
-    def write(self,msg):
-        if msg.instance not in self.written.keys():
-            print(msg.vval, flush=True)
-            self.written[msg.instance]=True
-            self.order.append(msg.instance)
-            self.values.append(msg.vval)
-            self.learned[msg.instance] = msg
+    def process_in_total_order(self,msg):
+        # process msg in total order
+        delivered=False
+        while not delivered:
+            (id, instance)=msg.instance
+            self.total_order[id][instance] =val= msg.vval
+            #check to see if it is the msg we expect
+            if instance == self.last[id]:
+                # increase counter of last msg
+                self.last[id] += 1
+                #if not delivered yet
+                if instance not in self.IO[id].keys():
+                    # deliver msg
+                    self.IO[id][instance]= val
+                    delivered=True
+                    print(val, flush=True)
+            else:
+                time.sleep(.0001)
+
 
     def msg_handler(self,msg):
         msg = unserialize(msg)
         if msg.phase=='Decide':
-            self.write(msg)
+            self.process_in_total_order(msg)
+            # self.write(msg)
         elif msg.phase=='Catch_up':
             self.handle_catchup(msg)
         elif msg.phase=='Request_catchup':
