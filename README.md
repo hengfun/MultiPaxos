@@ -27,7 +27,7 @@ directory:
 5) Test no consensus with 1 Acceptor
 
       
-     ./run_1acceptor.sh paxos 1000 && ./check_all.sh 
+    ./run_1acceptor.sh paxos 1000 && ./check_all.sh 
      
 6) Test learner catchup: Initially 1 learner and 1 client. Learner 2 and Client 2 comes online, Client 2 proposes additional 100 values, Make sure Learner 2, learns values in total order.
 
