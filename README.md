@@ -11,19 +11,40 @@ Python==3.6
 directory:
 
    ~/MultiPaxos/paxos
+   
+2) Run all tests in root folder
 
-Your *.sh scripts should be directly inside it
-(e.g. ~/MultiPaxos/paxos/acceptor.sh) and should work when called
-from inside the directory itself.
+cd ~/MultiPaxos/
 
-2) Run one of the "run*.sh" from inside THIS folder. When the run
-finishes, run "check_all.sh" to check the output of the run. For
-example:
+3)  Test consensus with 3 Acceptors
 
-    cd ~/MultiPaxos/
+     Acceptors, 2 Proposer, 2 Learners, 2 Clients
+
     ./run.sh paxos 10000 && ./check_all.sh 
 
-3) After a run ends, run "check_all.sh" to see if everything went OK.
-"Test 3" might FAIL in some cases, but with few proposed values and no message
-loss it should also be OK.
+4) Test consensus with 2 Acceptors
 
+      2 Acceptors, 2 Proposer, 2 Learners, 2 Clients 
+
+     ./run_2acceptor.sh paxos 1000 && ./check_all.sh 
+     
+5) Test no consensus with 1 Acceptor
+
+      1 Acceptors, 2 Proposer, 2 Learners, 2 Clients 
+      
+     ./run_1acceptor.sh paxos 1000 && ./check_all.sh 
+     
+6) Test learner catchup: Initially 1 learner and 1 client. Learner 2 and Client 2 comes online, Client 2 proposes additional 100 values, Make sure Learner 2, learns values in total order.
+
+   3 Acceptors, 2 Proposer, 2 Learner, 2 Clients, 
+
+   
+   ./run_catchup.sh paxos 1000 && ./check_all.sh 
+   
+ 7) Loss messages: Make sure learners, learn messages in total order
+ 
+   3 Acceptors, 2 Proposer, 2 Learners, 2 Clients
+ 
+   
+
+     
