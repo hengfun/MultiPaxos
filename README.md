@@ -1,3 +1,6 @@
+## = Description =
+MultiPaxos implementation for Distributed Algorithims USI 2018
+
 ## = Dependencies =
 
 Python==3.6
