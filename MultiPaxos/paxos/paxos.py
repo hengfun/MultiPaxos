@@ -252,32 +252,6 @@ class learner(object):
         m = Msg(phase='Request_catchup')
         self.s.sendto(serialize(m), self.config['learners'])
 
-    # def handle_catchup(self,msg):
-    #     #if you are not caught up
-    #     if len(self.order)==0:
-    #         self.order = msg.order
-    #         # deliver msgs in the order
-    #         for k,v in zip(msg.order,msg.values):
-    #             #write msgs if not delivered
-    #             if k not in self.written.keys():
-    #                 self.written[k] = v
-    #                 print(v,flush=True)
-
-    # def msg_replay(self):
-    #     #only send catch up if you have been caught up
-    #     if len(self.order)>0:
-    #         #send all msgs that have been decided, and their order
-    #         m = Msg(phase="Catch_up", values=self.values,order=self.order)
-    #         self.s.sendto(serialize(m), self.config['learners'])
-
-    # def write(self,msg):
-    #     if msg.instance not in self.written.keys():
-    #         print(msg.vval, flush=True)
-    #         self.written[msg.instance]=True
-    #         self.order.append(msg.instance)
-    #         self.values.append(msg.vval)
-    #         self.learned[msg.instance] = msg
-
     def handle_catchup(self,msg):
         #if you are not caught up
         if len(self.total_order.keys())==0:
