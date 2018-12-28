@@ -18,9 +18,9 @@ finishes, run "check_all.sh" to check the output of the run. For
 example:
 
     cd ~/MultiPaxos/
-    ./run.sh paxos 100  # each client will submit 100 values
-    # wait for the run to finish
-    ./check_all.sh # check the run
+    ./run.sh paxos 100,  each client will submit 100 values
+     wait for the run to finish
+    ./check_all.sh,  check the run
 
 3) After a run ends, run "check_all.sh" to see if everything went OK.
 "Test 3" might FAIL in some cases, but with few proposed values and no message
