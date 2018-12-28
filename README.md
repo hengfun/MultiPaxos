@@ -5,7 +5,7 @@ MultiPaxos implementation for Distributed Algorithims USI 2018
 
 Python==3.6
 
-## = How to run the tests: =
+## = How to run the tests =
 
 1) Root paxos implementation is inside this
 directory:
@@ -36,7 +36,7 @@ directory:
    
  7) Loss messages: Make sure learners, learn messages in total order even with % of loss messages
  
-   ./run_loss.sh paxos 1000 && ./check_all.sh 
+      ./run_loss.sh paxos 1000 && ./check_all.sh 
  
  
    
