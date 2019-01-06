@@ -72,7 +72,7 @@ class acceptor(object):
         self.s = mcast_sender()
         self.listen()
     def handle_1B(self,msg):
-        if msg.crnd > msg.vrnd:
+        if msg.crnd > msg.rnd:
             msg.rnd = msg.crnd
             msg.phase = '1B'
             msg.id = self.id
@@ -105,6 +105,7 @@ class proposer(object):
         #assume 1 failure, threshold to be 3-1= 2 acceptors
         self.failure_thresh = 3-1
         self.timeout_thresh = 3
+        self.decide_order = defaultdict(int)
         self.alive = {}
         #leader starts off as 1
         self.leader_id = 1
@@ -211,6 +212,8 @@ class proposer(object):
                 if self.decided[msg.instance] == None:
                     self.decided[msg.instance] = msg.cval
                     msg.phase='Decide'
+                    msg.instance = (msg.id,self.decide_order[msg.id])
+                    self.decide_order[msg.id]+=1
                     self.s.sendto(serialize(msg), self.config['learners'])
 
     def msg_handler(self,msg):
