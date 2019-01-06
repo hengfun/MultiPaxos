@@ -71,7 +71,7 @@ class acceptor(object):
         self.s = mcast_sender()
         self.listen()
     def handle_1B(self,msg):
-        if msg.crnd > msg.vrnd:
+        if msg.crnd > msg.rnd:
             msg.rnd = msg.crnd
             msg.phase = '1B'
             msg.id = self.id
